@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Linux,redis," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="redis集群&amp;emsp;&amp;emsp;在redis集群安装之前，需要先在服务器上安装好redis服务，redis集群三主三从，最少需要在三台服务器上安装好redis服务。安装redis说明可参考redis学习笔记（一）安装与配置&amp;emsp;&amp;emsp;在redis 5版本之前，需要依赖ruby，版本依赖问题不做深究，至于ruby的安装可参考ruby安装&amp;emsp;&amp;emsp;安装ruby后需要为r">
+<meta property="og:type" content="article">
+<meta property="og:title" content="redis集群安装(三主三从)">
+<meta property="og:url" content="http://yoursite.com/2020/08/12/redis%E9%9B%86%E7%BE%A4%E5%AE%89%E8%A3%85-%E4%B8%89%E4%B8%BB%E4%B8%89%E4%BB%8E/index.html">
+<meta property="og:site_name" content="eYoung的博客">
+<meta property="og:description" content="redis集群&amp;emsp;&amp;emsp;在redis集群安装之前，需要先在服务器上安装好redis服务，redis集群三主三从，最少需要在三台服务器上安装好redis服务。安装redis说明可参考redis学习笔记（一）安装与配置&amp;emsp;&amp;emsp;在redis 5版本之前，需要依赖ruby，版本依赖问题不做深究，至于ruby的安装可参考ruby安装&amp;emsp;&amp;emsp;安装ruby后需要为r">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-08-12T13:28:27.000Z">
+<meta property="article:modified_time" content="2020-08-12T14:12:56.194Z">
+<meta property="article:author" content="eYoung">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="redis">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/08/12/redis集群安装-三主三从/"/>
+
+
+
+
+
+  <title>redis集群安装(三主三从) | eYoung的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">eYoung的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            Commonweal 404
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-spring">
+          <a href="/spring" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            spring
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-redis">
+          <a href="/redis" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-bars"></i> <br />
+            
+            redis
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/12/redis%E9%9B%86%E7%BE%A4%E5%AE%89%E8%A3%85-%E4%B8%89%E4%B8%BB%E4%B8%89%E4%BB%8E/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="eYoung">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/img/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="eYoung的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">redis集群安装(三主三从)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-08-12T21:28:27+08:00">
+                2020-08-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/redis/" itemprop="url" rel="index">
+                    <span itemprop="name">redis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="redis集群"><a href="#redis集群" class="headerlink" title="redis集群"></a>redis集群</h2><p>&emsp;&emsp;在redis集群安装之前，需要先在服务器上安装好redis服务，redis集群三主三从，最少需要在三台服务器上安装好redis服务。安装redis说明可参考<a href="/2020/08/11/redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE/" title="redis学习笔记（一）安装与配置">redis学习笔记（一）安装与配置</a><br>&emsp;&emsp;在redis 5版本之前，需要依赖ruby，版本依赖问题不做深究，至于ruby的安装可参考<a href="/2020/08/12/ruby%E5%AE%89%E8%A3%85/" title="ruby安装">ruby安装</a><br>&emsp;&emsp;安装ruby后需要为ruby安装一下第三方接口，可在线执行安装命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gem install redis</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;如果服务器无网络链接，可预先在<code>https://rubygems.org/downloads/redis-4.1.3.gem</code>下载好<code>redis-4.1.3.gem</code>文件，然后上传到服务器，之后在文件所在目录执行一下<br> <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gem install -l .&#x2F;redis-4.1.3.gem</span><br></pre></td></tr></table></figure><br>接下来开始redis集群安装，假设服务器节点信息如下  </p>
+<blockquote>
+<p>10.195.173.29:7200<br> 10.195.173.29:7201<br> 10.195.173.36:7200<br> 10.195.173.36:7201<br> 10.195.173.40:7200<br> 10.195.173.40:7201</p>
+</blockquote>
+<p>在每一台服务器目录<code>/usr/local/redis</code>目录下批量创建<code>redis-cluster/7200</code>和<code>redis-cluster/7201</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost redis] mkdir -p redis-cluster&#x2F;7200 redis-cluster&#x2F;7201</span><br></pre></td></tr></table></figure>
+
+<p>之后在7200和7201目录下分别创建<code>redis-7200.conf</code>、<code>redis-7201.conf</code>，建议从源文件包中拷贝一份文件到相应的目录中</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost 7200] cp &#x2F;opt&#x2F;redis-4.0.14&#x2F;redis.conf redis-7200.conf</span><br><span class="line">[root@localhost 7200] cp &#x2F;opt&#x2F;redis-4.0.14&#x2F;redis.conf redis-7201.conf</span><br></pre></td></tr></table></figure>
+<p>修改<code>redis-7200.conf redis-7201.conf</code>文件，注意两个文件配置的端口不一样</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">port 7200</span><br><span class="line">daemonize yes</span><br><span class="line">protected-mode no</span><br><span class="line">dir &#x2F;usr&#x2F;local&#x2F;redis&#x2F;redis-cluster&#x2F;7200&#x2F;</span><br><span class="line">cluster-enabled yes</span><br><span class="line">cluster-config-file nodes-7200.conf</span><br><span class="line">cluster-node-timeout 5000</span><br><span class="line">appendonly yes</span><br><span class="line">pidfile redis_7200.pid</span><br><span class="line">loglevel notice</span><br><span class="line">logfile &quot;notice.log&quot;</span><br><span class="line">#bind 127.0.0.1</span><br></pre></td></tr></table></figure>
+<p>三台服务器按照上述配置完成后，启动各个redis节点</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@i-212a7852 redis-cluster]# &#x2F;usr&#x2F;local&#x2F;redis&#x2F;bin&#x2F;redis-server &#x2F;usr&#x2F;local&#x2F;redis&#x2F;redis-cluster&#x2F;7201&#x2F;redis-7201.conf </span><br><span class="line">[root@i-212a7852 redis-cluster]# &#x2F;usr&#x2F;local&#x2F;redis&#x2F;bin&#x2F;redis-server &#x2F;usr&#x2F;local&#x2F;redis&#x2F;redis-cluster&#x2F;7202&#x2F;redis-7202.conf</span><br></pre></td></tr></table></figure>
+
+<p> 启动完成后，在其中一台服务器上启动搭建集群命令，<code>Redis</code>会给出一个预计的方案，对6个节点分配3主3从，如果认为没有问题，输入yes确认，另外注意用绝对IP，不要用127.0.0.1</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">[root@i-212a7852 redis-cluster]# &#x2F;usr&#x2F;local&#x2F;redis&#x2F;bin&#x2F;redis-trib.rb create --replicas 1 10.195.173.29:7200 10.195.173.29:7201 10.195.173.36:7200 10.195.173.36:7201 10.195.173.40:7200 10.195.173.40:7201</span><br><span class="line">&gt;&gt;&gt; Creating cluster</span><br><span class="line">&gt;&gt;&gt; Performing hash slots allocation on 6 nodes...</span><br><span class="line">Using 3 masters:</span><br><span class="line">10.195.173.29:7200</span><br><span class="line">10.195.173.36:7200</span><br><span class="line">10.195.173.40:7200</span><br><span class="line">Adding replica 10.195.173.29:7201 to 10.195.173.29:7200</span><br><span class="line">Adding replica 10.195.173.36:7201 to 10.195.173.36:7200</span><br><span class="line">Adding replica 10.195.173.40:7201 to 10.195.173.40:7200</span><br><span class="line">&gt;&gt;&gt; Trying to optimize slaves allocation for anti-affinity</span><br><span class="line">[WARNING] Some slaves are in the same host as their master</span><br><span class="line">M: fb116678b41904d9fe458382cf0c4f1a135b3c81 10.195.173.29:7200</span><br><span class="line">   slots:0-5460 (5461 slots) master</span><br><span class="line">M: b3abcdc8db3321032925ba67db8f2cfee53e038d 10.195.173.36:7200</span><br><span class="line">   slots:5461-10922 (5462 slots) master</span><br><span class="line">M: 3b3a89b0324132f47a049a2aad0c7781ed4eb0de 10.195.173.40:7200</span><br><span class="line">   slots:10923-16383 (5461 slots) master</span><br><span class="line">S: 585b94dc3cf3d18d12d8c21ccbe4080e9372e867 10.195.173.29:7201</span><br><span class="line">   replicates b3abcdc8db3321032925ba67db8f2cfee53e038d</span><br><span class="line">S: ad8bc0cc83db06a68705e0127960654a7e9f7dc0 10.195.173.36:7201</span><br><span class="line">   replicates 3b3a89b0324132f47a049a2aad0c7781ed4eb0de</span><br><span class="line">S: 4ba7b4503298f451da4f021857ec9e5136b4c492 10.195.173.40:7201</span><br><span class="line">   replicates fb116678b41904d9fe458382cf0c4f1a135b3c81</span><br><span class="line">Can I set the above configuration? (type &#39;yes&#39; to accept): yes</span><br><span class="line">&gt;&gt;&gt; Nodes configuration updated</span><br><span class="line">&gt;&gt;&gt; Assign a different config epoch to each node</span><br><span class="line">&gt;&gt;&gt; Sending CLUSTER MEET messages to join the cluster</span><br><span class="line">Waiting for the cluster to join...</span><br><span class="line">&gt;&gt;&gt; Performing Cluster Check (using node 172.18.32.39:7201)</span><br><span class="line">M: fb116678b41904d9fe458382cf0c4f1a135b3c81 10.195.173.29:7200</span><br><span class="line">   slots:0-5460 (5461 slots) master</span><br><span class="line">   1 additional replica(s)</span><br><span class="line">M: b3abcdc8db3321032925ba67db8f2cfee53e038d 10.195.173.36:7200</span><br><span class="line">   slots:5461-10922 (5462 slots) master</span><br><span class="line">   1 additional replica(s)</span><br><span class="line">S: ad8bc0cc83db06a68705e0127960654a7e9f7dc0 10.195.173.40:7200</span><br><span class="line">   slots: (0 slots) slave</span><br><span class="line">   replicates 3b3a89b0324132f47a049a2aad0c7781ed4eb0de</span><br><span class="line">S: 4ba7b4503298f451da4f021857ec9e5136b4c492 10.195.173.29:7201</span><br><span class="line">   slots: (0 slots) slave</span><br><span class="line">   replicates fb116678b41904d9fe458382cf0c4f1a135b3c81</span><br><span class="line">M: 3b3a89b0324132f47a049a2aad0c7781ed4eb0de 10.195.173.36:7201</span><br><span class="line">   slots:10923-16383 (5461 slots) master</span><br><span class="line">   1 additional replica(s)</span><br><span class="line">S: 585b94dc3cf3d18d12d8c21ccbe4080e9372e867 10.195.173.40:7201</span><br><span class="line">   slots: (0 slots) slave</span><br><span class="line">   replicates b3abcdc8db3321032925ba67db8f2cfee53e038d</span><br><span class="line">[OK] All nodes agree about slots configuration.</span><br><span class="line">&gt;&gt;&gt; Check for open slots...</span><br><span class="line">&gt;&gt;&gt; Check slots coverage...</span><br><span class="line">[OK] All 16384 slots covered.</span><br></pre></td></tr></table></figure>
+
+<p>还有需要注意一点，从redis 5.x 版本开始，redis-trib.rb已经废弃了，直接用–cluster命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@i-212a7852 redis-cluster]# &#x2F;usr&#x2F;local&#x2F;redis&#x2F;bin&#x2F;redis-cli --cluster create --cluster-replicas 1 10.195.173.29:7200 10.195.173.29:7201 10.195.173.36:7200 10.195.173.36:7201 10.195.173.40:7200 10.195.173.40:7201</span><br></pre></td></tr></table></figure>
+
+
+
+<p>命令执行成功后，集群搭建成功。</p>
+<blockquote>
+<p>附录：</p>
+<h3 id="集群命令"><a href="#集群命令" class="headerlink" title="集群命令"></a>集群命令</h3><p>cluster info ：打印集群的信息<br>cluster nodes ：列出集群当前已知的所有节点（node），以及这些节点的相关信息。<br>cluster meet ：将 ip 和 port 所指定的节点添加到集群当中，让它成为集群的一份子。<br>cluster forget <node_id> ：从集群中移除 node_id 指定的节点(保证空槽道)。<br>cluster replicate <node_id> ：将当前节点设置为 node_id 指定的节点的从节点。<br>cluster saveconfig ：将节点的配置文件保存到硬盘里面。</p>
+<h3 id="槽slot命令"><a href="#槽slot命令" class="headerlink" title="槽slot命令"></a>槽slot命令</h3><p>cluster addslots [slot …] ：将一个或多个槽（slot）指派（assign）给当前节点。<br>cluster delslots [slot …] ：移除一个或多个槽对当前节点的指派。<br>cluster flushslots ：移除指派给当前节点的所有槽，让当前节点变成一个没有指派任何槽的节点。<br>cluster setslot node <node_id> ：将槽 slot 指派给 node_id 指定的节点，如果槽已经指派给另一个节点，那么先让另一个节点删除该槽&gt;，然后再进行指派。<br>cluster setslot migrating <node_id> ：将本节点的槽 slot 迁移到 node_id 指定的节点中。<br>cluster setslot importing <node_id> ：从 node_id 指定的节点中导入槽 slot 到本节点。<br>cluster setslot stable ：取消对槽 slot 的导入（import）或者迁移（migrate）。</p>
+<h3 id="键命令"><a href="#键命令" class="headerlink" title="键命令"></a>键命令</h3><p>cluster keyslot ：计算键 key 应该被放置在哪个槽上。<br>cluster countkeysinslot ：返回槽 slot 目前包含的键值对数量。<br>cluster getkeysinslot ：返回 count 个 slot 槽中的键</p>
+</blockquote>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>Donate comment here</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>Donate</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/img/wechatpay.jpg" alt="eYoung WeChat Pay"/>
+        <p>WeChat Pay</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/img/alipay.png" alt="eYoung Alipay"/>
+        <p>Alipay</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux/" rel="tag"># Linux</a>
+          
+            <a href="/tags/redis/" rel="tag"># redis</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/08/12/Linux%E7%8E%AF%E5%A2%83%E6%8C%87%E5%AE%9A%E7%9B%AE%E5%BD%95%E5%AE%9A%E6%97%B6%E5%88%A0%E9%99%A4%E4%B8%80%E4%B8%AA%E6%9C%88%E5%89%8D%E7%9A%84%E6%96%87%E4%BB%B6/" rel="next" title="Linux环境指定目录定时删除一个月前的文件">
+                <i class="fa fa-chevron-left"></i> Linux环境指定目录定时删除一个月前的文件
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/08/12/ruby%E5%AE%89%E8%A3%85/" rel="prev" title="ruby安装">
+                ruby安装 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/img/head.jpg"
+                alt="eYoung" />
+            
+              <p class="site-author-name" itemprop="name">eYoung</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/jamy888" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jamy888@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://gitee.com/jamy888" target="_blank" title="gitee">
+                      
+                        <i class="fa fa-fw fa-git-square"></i>gitee</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/jamyzyy" target="_blank" title="csdn">
+                      
+                        <i class="fa fa-fw fa-bookmark-o"></i>csdn</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://zhihu.com/people/jamy888" target="_blank" title="zhihu">
+                      
+                        <i class="fa fa-fw fa-globe"></i>zhihu</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="/img/qq.jpg" target="_blank" title="qq">
+                      
+                        <i class="fa fa-fw fa-qq"></i>qq</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="/img/weixin.jpg" target="_blank" title="weixin">
+                      
+                        <i class="fa fa-fw fa-weixin"></i>weixin</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/jamyzyy" target="_blank" title="weibo">
+                      
+                        <i class="fa fa-fw fa-weibo"></i>weibo</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#redis集群"><span class="nav-number">1.</span> <span class="nav-text">redis集群</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#集群命令"><span class="nav-number">1.1.</span> <span class="nav-text">集群命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#槽slot命令"><span class="nav-number">1.2.</span> <span class="nav-text">槽slot命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#键命令"><span class="nav-number">1.3.</span> <span class="nav-text">键命令</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">eYoung</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

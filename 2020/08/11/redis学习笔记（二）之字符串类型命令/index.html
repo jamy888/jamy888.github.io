@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="redis," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="字符串类型&amp;emsp;&amp;emsp;字符串类型是redis中最基本的数据类型，他能存储任何形式的字符串，包括二进制数据。一个字符串类型键允许的数据的最大容量是512MB。 命令SET和GET类似于读和写变量   1234567SET key value [EX seconds] [PX milliseconds] [NX|XX]GET keySET命令的参数：EX seconds：以**秒**为单位">
+<meta property="og:type" content="article">
+<meta property="og:title" content="redis学习笔记（二）之字符串类型命令">
+<meta property="og:url" content="http://yoursite.com/2020/08/11/redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89%E4%B9%8B%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%B1%BB%E5%9E%8B%E5%91%BD%E4%BB%A4/index.html">
+<meta property="og:site_name" content="eYoung的博客">
+<meta property="og:description" content="字符串类型&amp;emsp;&amp;emsp;字符串类型是redis中最基本的数据类型，他能存储任何形式的字符串，包括二进制数据。一个字符串类型键允许的数据的最大容量是512MB。 命令SET和GET类似于读和写变量   1234567SET key value [EX seconds] [PX milliseconds] [NX|XX]GET keySET命令的参数：EX seconds：以**秒**为单位">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-08-11T13:52:55.000Z">
+<meta property="article:modified_time" content="2020-08-12T03:24:43.721Z">
+<meta property="article:author" content="eYoung">
+<meta property="article:tag" content="redis">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/08/11/redis学习笔记（二）之字符串类型命令/"/>
+
+
+
+
+
+  <title>redis学习笔记（二）之字符串类型命令 | eYoung的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">eYoung的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            Commonweal 404
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-spring">
+          <a href="/spring" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            spring
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-redis">
+          <a href="/redis" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-bars"></i> <br />
+            
+            redis
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/11/redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89%E4%B9%8B%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%B1%BB%E5%9E%8B%E5%91%BD%E4%BB%A4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="eYoung">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/img/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="eYoung的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">redis学习笔记（二）之字符串类型命令</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-08-11T21:52:55+08:00">
+                2020-08-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/redis/" itemprop="url" rel="index">
+                    <span itemprop="name">redis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="字符串类型"><a href="#字符串类型" class="headerlink" title="字符串类型"></a>字符串类型</h2><p>&emsp;&emsp;字符串类型是redis中最基本的数据类型，他能存储任何形式的字符串，包括<strong>二进制数据</strong>。一个字符串类型键允许的数据的最大容量是512MB。</p>
+<h2 id="命令"><a href="#命令" class="headerlink" title="命令"></a>命令</h2><h3 id="SET和GET"><a href="#SET和GET" class="headerlink" title="SET和GET"></a><code>SET</code>和<code>GET</code></h3><p>类似于读和写变量  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">SET key value [EX seconds] [PX milliseconds] [NX|XX]</span><br><span class="line">GET key</span><br><span class="line">SET命令的参数：</span><br><span class="line">EX seconds：以**秒**为单位设置键的key过期时间</span><br><span class="line">PX millinseconds：以**毫秒**为单位设置过期时间</span><br><span class="line">NX ：只有键不存在的时候才可以设置成功</span><br><span class="line">XX：只有键在已经存在的时候才可以设置成功</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;举例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; SET test1 &quot;hello&quot;</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; GET test1</span><br><span class="line">&quot;hello&quot;</span><br><span class="line">127.0.0.1:6379&gt; GET test2</span><br><span class="line">(nil)</span><br><span class="line">&#x2F;&#x2F;当GET 一个不存在的键会返回空结果。</span><br><span class="line">127.0.0.1:6379&gt; SET test1 &quot;hello world&quot;</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; GET test1</span><br><span class="line">&quot;hello world&quot;</span><br><span class="line">&#x2F;&#x2F;多次SET同一个键时，键值会被覆盖。</span><br></pre></td></tr></table></figure>
+<h3 id="GETRANGE"><a href="#GETRANGE" class="headerlink" title="GETRANGE"></a>GETRANGE</h3><p>&emsp;&emsp;用于获取存储在键的字符串值的子字符串，由偏移量的开始和结束(两者都包括)确定。可以使用负偏移，以便从字符串的末尾开始计算偏移</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GETRANGE KEY_NAME start end</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;举例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; GETRANGE test1 0 4</span><br><span class="line">&quot;hello&quot;</span><br><span class="line">127.0.0.1:6379&gt; GETRANGE test1 0 -1</span><br><span class="line">&quot;hello world&quot;</span><br><span class="line">127.0.0.1:6379&gt; GETRANGE test1 6 -1</span><br><span class="line">&quot;world&quot;</span><br></pre></td></tr></table></figure>
+<h3 id="GETSET"><a href="#GETSET" class="headerlink" title="GETSET"></a>GETSET</h3><p>&emsp;&emsp;在Redis键中设置指定的字符串值，并返回其旧值，不存在返回空结果。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GETSET key value</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;举例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; GETSET test2 &quot;first GETSET&quot;</span><br><span class="line">(nil)</span><br><span class="line">127.0.0.1:6379&gt; GETSET test2 &quot;second GETSET&quot;</span><br><span class="line">&quot;first GETSET&quot;</span><br></pre></td></tr></table></figure>
+<h3 id="MGET-和-MSET"><a href="#MGET-和-MSET" class="headerlink" title="MGET 和 MSET"></a>MGET 和 MSET</h3><p>&emsp;&emsp;MGET命令用于获取所有指定键的值。对于不包含字符串值或不存在的每个键，返回空结果<br>&emsp;&emsp;MSET命令用于一次多个键设置它们的值。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">MGET key [key ...]</span><br><span class="line">MSET key value [key value ...]</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;举例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; MSET test3 &quot;hello&quot; test4 &quot;world&quot; test5 &quot;!!!&quot;</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; MGET test3 test4 test5 test6</span><br><span class="line">1) &quot;hello&quot;</span><br><span class="line">2) &quot;world&quot;</span><br><span class="line">3) &quot;!!!&quot;</span><br><span class="line">4) (nil)    &#x2F;&#x2F;不存在的键返回空结果</span><br></pre></td></tr></table></figure>
+<h3 id="STRLEN"><a href="#STRLEN" class="headerlink" title="STRLEN"></a>STRLEN</h3><p>&emsp;&emsp;用于获取存储在键中的字符串值的长度。当键包含非字符串值时返回错误</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">STRLEN key</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;举例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; STRLEN test5</span><br><span class="line">(integer) 3</span><br><span class="line">127.0.0.1:6379&gt; STRLEN test6</span><br><span class="line">(integer) 0</span><br><span class="line">&#x2F;&#x2F;不存在的键返回整数0</span><br></pre></td></tr></table></figure>
+<h3 id="SETRANGE"><a href="#SETRANGE" class="headerlink" title="SETRANGE"></a>SETRANGE</h3><p>&emsp;&emsp;命令用于覆盖键的值，从指定偏移处开始的一部分字符串，返回字符串在修改后的长度。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SETRANGE key offset value</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;举例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; GET test1</span><br><span class="line">&quot;hello redis&quot;</span><br><span class="line">127.0.0.1:6379&gt; SETRANGE test1 6 &quot;ubuntu&quot;</span><br><span class="line">(integer) 12</span><br><span class="line">127.0.0.1:6379&gt; GET test1</span><br><span class="line">&quot;hello ubuntu&quot;</span><br><span class="line"></span><br><span class="line">127.0.0.1:6379&gt; GETSET test1 &quot;abc&quot;</span><br><span class="line">&quot;hello ubuntu&quot;</span><br><span class="line">127.0.0.1:6379&gt; SETRANGE test1 4 &quot;def&quot;</span><br><span class="line">(integer) 7</span><br><span class="line">127.0.0.1:6379&gt; GET test1</span><br><span class="line">&quot;abc\x00def&quot;</span><br><span class="line">&#x2F;&#x2F;如果设置的key原来的字符串长度要比偏移量小，就会以零字节（\x00）来补充</span><br></pre></td></tr></table></figure>
+<h3 id="SETNX"><a href="#SETNX" class="headerlink" title="SETNX"></a>SETNX</h3><p>&emsp;&emsp;命令用于在Redis键中设置某些字符串值(如果该键在Redis中不存在)。如果不存在，则SETNX的全形式是SET。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SETNX key value</span><br><span class="line">&#x2F;&#x2F;等价于 SET key value NX</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;举例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; EXISTS test6        &#x2F;&#x2F;测试键是否存在，存在返回整数1，否则返回0</span><br><span class="line">(integer) 0 </span><br><span class="line">127.0.0.1:6379&gt; SETNX test6 &quot;test6 is not exists&quot;</span><br><span class="line">(integer) 1         &#x2F;&#x2F;设置成功</span><br><span class="line">127.0.0.1:6379&gt; GET test6 </span><br><span class="line">&quot;test6 is not exists&quot;</span><br><span class="line"></span><br><span class="line">127.0.0.1:6379&gt; EXISTS test5</span><br><span class="line">(integer) 1 </span><br><span class="line">127.0.0.1:6379&gt; SETNX test &quot;test5 is exists&quot;</span><br><span class="line">(integer) 0     &#x2F;&#x2F;test5设置设置失败</span><br></pre></td></tr></table></figure>
+<h3 id="SETEX"><a href="#SETEX" class="headerlink" title="SETEX"></a>SETEX</h3><p>&emsp;&emsp;命令用于在Redis键中的指定超时，设置键的字符串值。<br>&emsp;&emsp;SETEX是原子操作，相当于执行了SET键值又对key设置了过期时间。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SETEX key seconds value</span><br><span class="line">&#x2F;&#x2F;等价于 SET key value EX seconds</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;举例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; SETEX test1 30 &quot;thirty&quot;</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; TTL test1   &#x2F;&#x2F;查看键的生存时间，test1已过期</span><br><span class="line">(integer) -2</span><br><span class="line">127.0.0.1:6379&gt; GET test1   </span><br><span class="line">(nil)</span><br></pre></td></tr></table></figure>
+<h3 id="MSETNX"><a href="#MSETNX" class="headerlink" title="MSETNX"></a>MSETNX</h3><p>&emsp;&emsp;用于为多个键设置多个值(仅当在键都不存在时)。如果当前操作中有任何一个存在于Redis中，那么MSETNX不执行任何操作。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MSETNX key value [key value ...]</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;举例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; MSETNX test7 &quot;7&quot; test8 &quot;8&quot;</span><br><span class="line">(integer) 1     &#x2F;&#x2F;返回1设置成功</span><br><span class="line">127.0.0.1:6379&gt; MGET test7 test8 </span><br><span class="line">1) &quot;7&quot;</span><br><span class="line">2) &quot;8&quot;</span><br><span class="line">127.0.0.1:6379&gt; MSETNX test8 &quot;8&quot; test9 &quot;9&quot;</span><br><span class="line">(integer) 0 </span><br><span class="line">127.0.0.1:6379&gt; MGET test8 test9</span><br><span class="line">1) &quot;8&quot;</span><br><span class="line">2) (nil)        &#x2F;&#x2F;test9设置失败</span><br></pre></td></tr></table></figure>
+<h3 id="PSETEX"><a href="#PSETEX" class="headerlink" title="PSETEX"></a>PSETEX</h3><p>&emsp;&emsp;命令用于设置键的值，以毫秒为单位指定过期时间</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PSETEX key milliseconds value</span><br><span class="line">&#x2F;&#x2F;等价于 SET key value PX milliseconds</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;举例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; PSETEX test9 2000 &quot;millinseconds&quot;</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; PTTL test9  &#x2F;&#x2F;PTTL获得毫秒级的生存时间</span><br><span class="line">(integer) 624   </span><br><span class="line">127.0.0.1:6379&gt; GET test9</span><br><span class="line">(nil)</span><br></pre></td></tr></table></figure>
+<h3 id="INCR"><a href="#INCR" class="headerlink" title="INCR"></a>INCR</h3><p>&emsp;&emsp;命令用于将键的整数值递增1。如果键不存在，则在执行操作之前将其设置为0。如果键包含错误类型的值或包含无法表示为整数的字符串，则会返回错误。此操作限于64位有符号整数。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">INCR key</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;举例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; INCR counter    &#x2F;&#x2F;如果key不存在，先初始化为0，在进行INCR操作</span><br><span class="line">(integer) 1</span><br><span class="line">127.0.0.1:6379&gt; INCR counter</span><br><span class="line">(integer) 2</span><br><span class="line">127.0.0.1:6379&gt; INCR counter</span><br><span class="line">(integer) 3</span><br></pre></td></tr></table></figure>
+<h3 id="INCRBY"><a href="#INCRBY" class="headerlink" title="INCRBY"></a>INCRBY</h3><p>&emsp;&emsp;用于将存储在键上的数字按指定的值增加。 如果键不存在，则在执行操作之前将其设置为0。如果键包含错误类型的值或包含无法表示为整数的字符串，则会返回错误。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">INCRBY key increment</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;举例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; GET counter</span><br><span class="line">&quot;3&quot;</span><br><span class="line">127.0.0.1:6379&gt; INCRBY counter 10</span><br><span class="line">(integer) 13</span><br></pre></td></tr></table></figure>
+<h3 id="INCRBYFLOAT"><a href="#INCRBYFLOAT" class="headerlink" title="INCRBYFLOAT"></a>INCRBYFLOAT</h3><p>&emsp;&emsp;用于将递增的字符串表示为浮点数，该值存储在键上指定的增量。 如果键不存在，则在执行操作之前将其设置为0。 如果键包含错误类型的值或当前键内容或指定的增量不能解析为浮点数，则返回错误。<br>支持小数点往后17位的运算操作</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">INCRBYFLOAT key increment</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;举例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; INCRBYFLOAT linux 1</span><br><span class="line">&quot;1&quot;</span><br><span class="line">127.0.0.1:6379&gt; INCRBYFLOAT linux 0.012345678901234567890123456789</span><br><span class="line">&quot;1.01234567890123457&quot;</span><br></pre></td></tr></table></figure>
+<h3 id="DECR"><a href="#DECR" class="headerlink" title="DECR"></a>DECR</h3><p>&emsp;&emsp;用于将键的整数值减1。 如果键不存在，则在执行操作之前将其设置为0。 如果键包含错误类型的值或包含无法表示为整数的字符串，则会返回错误。 此操作限于64位有符号整数。  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DECR key</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;举例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; DECR counter</span><br><span class="line">(integer) -1</span><br><span class="line">127.0.0.1:6379&gt; DECR counter</span><br><span class="line">(integer) -2</span><br><span class="line">127.0.0.1:6379&gt; DECR counter</span><br><span class="line">(integer) -3</span><br></pre></td></tr></table></figure>
+<h3 id="DECRBY"><a href="#DECRBY" class="headerlink" title="DECRBY"></a>DECRBY</h3><p>&emsp;&emsp;将存储在键上的数字按指定的值减少。如果键不存在，则在执行操作之前将其设置为0。 如果键包含错误类型的值或包含无法表示为整数的字符串，则会返回错误。  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DECRBY key decrement</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;举例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; DECRBY counter -10</span><br><span class="line">(integer) 7</span><br><span class="line">127.0.0.1:6379&gt; DECRBY counter -10</span><br><span class="line">(integer) 17</span><br></pre></td></tr></table></figure>
+<h3 id="APPEND"><a href="#APPEND" class="headerlink" title="APPEND"></a>APPEND</h3><p>&emsp;&emsp;命令用于在键中添加一些值。返回追加后的字符串长度。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">APPEND key value</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;举例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; SET say hello</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; APPEND say &quot; world&quot;</span><br><span class="line">(integer) 11</span><br><span class="line">127.0.0.1:6379&gt; GET say</span><br><span class="line">&quot;hello world&quot;</span><br></pre></td></tr></table></figure>
+<h3 id="GETBIT"><a href="#GETBIT" class="headerlink" title="GETBIT"></a>GETBIT</h3><p>&emsp;&emsp;可以获得一个字符串类型指定位置的二进制位的值（0或1），索引以0开始。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GETBIT key offset</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;举例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; SET foo bar &#x2F;&#x2F;bar的二进制表示如下表</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; GETBIT foo 0    &#x2F;&#x2F;下标为0的位值为0</span><br><span class="line">(integer) 0</span><br><span class="line">127.0.0.1:6379&gt; GETBIT foo 6    &#x2F;&#x2F;下标为6的位值为1</span><br><span class="line">(integer) 1</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;bar的二进制表示如下：</p>
+<table>
+<thead>
+<tr>
+<th>b</th>
+<th>a</th>
+<th>r</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>01100010</td>
+<td>01100001</td>
+<td>01110010</td>
+</tr>
+</tbody></table>
+<h3 id="SETBIT"><a href="#SETBIT" class="headerlink" title="SETBIT"></a>SETBIT</h3><p>&emsp;&emsp;设置字符串类型键指定位置的二进制位的值，返回该位置的旧值。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SETBIT key offset value</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;举例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; SETBIT foo 6 0</span><br><span class="line">(integer) 1</span><br><span class="line">127.0.0.1:6379&gt; SETBIT foo 7 1</span><br><span class="line">(integer) 0</span><br><span class="line">127.0.0.1:6379&gt; GET foo</span><br><span class="line">&quot;aar&quot;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;将b的二进制码01100010的下标第6和第7位分别置为0和1，得到01100001是a的ASCLL码。</p>
+<h3 id="BITOP"><a href="#BITOP" class="headerlink" title="BITOP"></a>BITOP</h3><p>&emsp;&emsp;可以对多个字符串类型键进行位运算，并将结果存在destkey参数规定的键中。<br>&emsp;&emsp;BITOP命令支持的运算操作有AND、OR、XOR和NOT</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">BITOP operation destkey key [key ...]</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;举例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; BITOP XOR res foo foo</span><br><span class="line">(integer) 3</span><br><span class="line">127.0.0.1:6379&gt; GET res</span><br><span class="line">&quot;\x00\x00\x00&quot;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;两个相同的值做异或运算结果为0。</p>
+<h3 id="BITPOS"><a href="#BITPOS" class="headerlink" title="BITPOS"></a>BITPOS</h3><p>&emsp;&emsp;获得指定键的第一个位值是0或者1的位置。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">BITPOS key bit [start] [end]</span><br><span class="line">&#x2F;&#x2F;start 和 end 位置以字节为单位</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;举例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; BITPOS foo 1    &#x2F;&#x2F;第一个值为1的位下标为1</span><br><span class="line">(integer) 1</span><br><span class="line">127.0.0.1:6379&gt; BITPOS foo 1 1 2    &#x2F;&#x2F;下标为1到2的字节中，第一个值为1的下标为整个键值的第9位</span><br><span class="line">(integer) 9</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>Donate comment here</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>Donate</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/img/wechatpay.jpg" alt="eYoung WeChat Pay"/>
+        <p>WeChat Pay</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/img/alipay.png" alt="eYoung Alipay"/>
+        <p>Alipay</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/redis/" rel="tag"># redis</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/08/11/redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE/" rel="next" title="redis学习笔记（一）安装与配置">
+                <i class="fa fa-chevron-left"></i> redis学习笔记（一）安装与配置
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/08/12/Linux%E7%8E%AF%E5%A2%83%E6%8C%87%E5%AE%9A%E7%9B%AE%E5%BD%95%E5%AE%9A%E6%97%B6%E5%88%A0%E9%99%A4%E4%B8%80%E4%B8%AA%E6%9C%88%E5%89%8D%E7%9A%84%E6%96%87%E4%BB%B6/" rel="prev" title="Linux环境指定目录定时删除一个月前的文件">
+                Linux环境指定目录定时删除一个月前的文件 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/img/head.jpg"
+                alt="eYoung" />
+            
+              <p class="site-author-name" itemprop="name">eYoung</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/jamy888" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jamy888@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://gitee.com/jamy888" target="_blank" title="gitee">
+                      
+                        <i class="fa fa-fw fa-git-square"></i>gitee</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/jamyzyy" target="_blank" title="csdn">
+                      
+                        <i class="fa fa-fw fa-bookmark-o"></i>csdn</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://zhihu.com/people/jamy888" target="_blank" title="zhihu">
+                      
+                        <i class="fa fa-fw fa-globe"></i>zhihu</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="/img/qq.jpg" target="_blank" title="qq">
+                      
+                        <i class="fa fa-fw fa-qq"></i>qq</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="/img/weixin.jpg" target="_blank" title="weixin">
+                      
+                        <i class="fa fa-fw fa-weixin"></i>weixin</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/jamyzyy" target="_blank" title="weibo">
+                      
+                        <i class="fa fa-fw fa-weibo"></i>weibo</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#字符串类型"><span class="nav-number">1.</span> <span class="nav-text">字符串类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#命令"><span class="nav-number">2.</span> <span class="nav-text">命令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SET和GET"><span class="nav-number">2.1.</span> <span class="nav-text">SET和GET</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GETRANGE"><span class="nav-number">2.2.</span> <span class="nav-text">GETRANGE</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GETSET"><span class="nav-number">2.3.</span> <span class="nav-text">GETSET</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MGET-和-MSET"><span class="nav-number">2.4.</span> <span class="nav-text">MGET 和 MSET</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#STRLEN"><span class="nav-number">2.5.</span> <span class="nav-text">STRLEN</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SETRANGE"><span class="nav-number">2.6.</span> <span class="nav-text">SETRANGE</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SETNX"><span class="nav-number">2.7.</span> <span class="nav-text">SETNX</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SETEX"><span class="nav-number">2.8.</span> <span class="nav-text">SETEX</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MSETNX"><span class="nav-number">2.9.</span> <span class="nav-text">MSETNX</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PSETEX"><span class="nav-number">2.10.</span> <span class="nav-text">PSETEX</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#INCR"><span class="nav-number">2.11.</span> <span class="nav-text">INCR</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#INCRBY"><span class="nav-number">2.12.</span> <span class="nav-text">INCRBY</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#INCRBYFLOAT"><span class="nav-number">2.13.</span> <span class="nav-text">INCRBYFLOAT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DECR"><span class="nav-number">2.14.</span> <span class="nav-text">DECR</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DECRBY"><span class="nav-number">2.15.</span> <span class="nav-text">DECRBY</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#APPEND"><span class="nav-number">2.16.</span> <span class="nav-text">APPEND</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GETBIT"><span class="nav-number">2.17.</span> <span class="nav-text">GETBIT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SETBIT"><span class="nav-number">2.18.</span> <span class="nav-text">SETBIT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BITOP"><span class="nav-number">2.19.</span> <span class="nav-text">BITOP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BITPOS"><span class="nav-number">2.20.</span> <span class="nav-text">BITPOS</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">eYoung</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

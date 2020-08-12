@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Linux,redis," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="redis简介  Redis是一个开源的、高性能的、基于键值对的缓存与存储系统，Redis是Remote DIctionary Server（远程字典服务器）的缩写。Redis支持五种数据类型：string（字符串），hash（哈希），list（列表），set（集合）及zset(sorted set：有序集合)。   离线安装准备redis安装包​    准备好redis安装包，本项目使用的red">
+<meta property="og:type" content="article">
+<meta property="og:title" content="redis学习笔记（一）安装与配置">
+<meta property="og:url" content="http://yoursite.com/2020/08/11/redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE/index.html">
+<meta property="og:site_name" content="eYoung的博客">
+<meta property="og:description" content="redis简介  Redis是一个开源的、高性能的、基于键值对的缓存与存储系统，Redis是Remote DIctionary Server（远程字典服务器）的缩写。Redis支持五种数据类型：string（字符串），hash（哈希），list（列表），set（集合）及zset(sorted set：有序集合)。   离线安装准备redis安装包​    准备好redis安装包，本项目使用的red">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-08-11T13:38:17.000Z">
+<meta property="article:modified_time" content="2020-08-12T03:24:43.729Z">
+<meta property="article:author" content="eYoung">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="redis">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/08/11/redis学习笔记（一）安装与配置/"/>
+
+
+
+
+
+  <title>redis学习笔记（一）安装与配置 | eYoung的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">eYoung的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            Commonweal 404
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-spring">
+          <a href="/spring" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            spring
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-redis">
+          <a href="/redis" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-bars"></i> <br />
+            
+            redis
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/11/redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="eYoung">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/img/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="eYoung的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">redis学习笔记（一）安装与配置</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-08-11T21:38:17+08:00">
+                2020-08-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/redis/" itemprop="url" rel="index">
+                    <span itemprop="name">redis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="redis简介"><a href="#redis简介" class="headerlink" title="redis简介"></a>redis简介</h1><p>  Redis是一个开源的、高性能的、基于键值对的缓存与存储系统，Redis是Remote DIctionary Server（远程字典服务器）的缩写。Redis支持五种数据类型：string（字符串），hash（哈希），list（列表），set（集合）及zset(sorted set：有序集合)。  </p>
+<h2 id="离线安装"><a href="#离线安装" class="headerlink" title="离线安装"></a>离线安装</h2><h3 id="准备redis安装包"><a href="#准备redis安装包" class="headerlink" title="准备redis安装包"></a>准备redis安装包</h3><p>​    准备好redis安装包，本项目使用的redis版本为4.0.14。redis官网下载地址为 <code>http://download.redis.io/releases/redis-4.0.14.tar.gz</code>  </p>
+<h3 id="解压编译安装"><a href="#解压编译安装" class="headerlink" title="解压编译安装"></a>解压编译安装</h3><p>​    将下载好的安装包防止在服务器某个目录，并执行解压命令  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost &#x2F;] tar -zxf redis-4.0.14.tar.gz</span><br></pre></td></tr></table></figure>
+<p>​    进入解压目录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost &#x2F;] cd redis-4.0.14</span><br></pre></td></tr></table></figure>
+<p>​    执行指定安装目录编译安装</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost redis-4.0.14] make PREFIX&#x3D;&#x2F;usr&#x2F;local&#x2F;redis install</span><br></pre></td></tr></table></figure>
+<p>​    进入安装目录，准备配置文件redis.conf</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost redis-4.0.14] cd &#x2F;usr&#x2F;local&#x2F;redis</span><br><span class="line">[root@localhost redis] cp &#x2F;opt&#x2F;redis-4.0.14&#x2F;redis.conf .</span><br><span class="line">[root@localhost redis] cp &#x2F;opt&#x2F;redis-4.0.14&#x2F;src&#x2F;redis-trib.rb bin&#x2F;</span><br></pre></td></tr></table></figure>
+<p>​    修改redis部分配置信息，<code>vi redis.conf</code>  把<code>daemonize no</code>  改为 <code>daemonize yes</code>，即redis启动时以守护进程方式启动，新增设置参数<code>requirepass (链接密码)</code> ，即客户端链接客户端时，需要链接口令</p>
+<h3 id="启动redis"><a href="#启动redis" class="headerlink" title="启动redis"></a>启动redis</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost redis] pwd</span><br><span class="line">&#x2F;usr&#x2F;local&#x2F;redis</span><br><span class="line">[root@localhost redis] bin&#x2F;redis-server  redis.conf</span><br></pre></td></tr></table></figure>
+<h3 id="验证redis是否启动成功"><a href="#验证redis是否启动成功" class="headerlink" title="验证redis是否启动成功"></a>验证redis是否启动成功</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost redis] netstat -tulnp | grep 6379</span><br><span class="line">tcp	  0	  0	  127.0.0.1:6379  0.0.0.0:*	 LISTEN	 14150&#x2F;bin&#x2F;redis-ser</span><br></pre></td></tr></table></figure>
+<p> 显示redis的端口6379已正常启动并监听中</p>
+<h3 id="设置开机自启动"><a href="#设置开机自启动" class="headerlink" title="设置开机自启动"></a>设置开机自启动</h3><ul>
+<li><p>在<code>/etc/init.d/</code>创建<code>redis</code>脚本<br><code>redis</code>脚本内容如下  </p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line">#chkconfig: <span class="number">22345</span> <span class="number">10</span> <span class="number">90</span></span><br><span class="line">#description: <span class="type">Start</span> and <span class="type">Stop</span> redis</span><br><span class="line"></span><br><span class="line"><span class="type">REDISPORT</span>=<span class="number">6379</span></span><br><span class="line"><span class="type">EXEC</span>=<span class="string">"/usr/local/redis/bin/redis-server"</span></span><br><span class="line"><span class="type">CLIEXEC</span>=<span class="string">"/usr/local/redis/bin/redis-cli"</span></span><br><span class="line"><span class="type">PIDFILE</span>=<span class="string">"/var/run/redis_"</span>$<span class="type">REDISPORT</span><span class="string">".pid"</span></span><br><span class="line"><span class="type">CONF</span>=<span class="string">"/usr/local/redis/redis.conf"</span></span><br><span class="line"><span class="type">PASSWORD</span>=<span class="string">"口令"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">case</span> <span class="string">"$1"</span> in</span><br><span class="line">    start)</span><br><span class="line">        <span class="keyword">if</span> [ -f $<span class="type">PIDFILE</span> ];then</span><br><span class="line">            echo <span class="string">"$PIDFILE exists,process is already running or crashed"</span></span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            echo <span class="string">"Starting Redis server..."</span></span><br><span class="line">            $<span class="type">EXEC</span> $<span class="type">CONF</span></span><br><span class="line">        fi</span><br><span class="line">        ;;</span><br><span class="line">    stop)</span><br><span class="line">        <span class="keyword">if</span> [ ! -f $<span class="type">PIDFILE</span> ];then</span><br><span class="line">            echo <span class="string">"$PIDFILE does not exist,process is not running"</span></span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            <span class="type">PID</span>=$(cat $<span class="type">PIDFILE</span>)</span><br><span class="line">            echo <span class="string">"Stopping..."</span></span><br><span class="line">            $<span class="type">CLIEXEC</span> -p $<span class="type">REDISPORT</span> -a $<span class="type">PASSWORD</span> shutdown</span><br><span class="line">            <span class="keyword">while</span> [ -x /proc/$&#123;<span class="type">PID</span>&#125; ]</span><br><span class="line">                do</span><br><span class="line">                    echo <span class="string">"Waiting for Redis to shutdown..."</span></span><br><span class="line">                    sleep <span class="number">1</span></span><br><span class="line">                done</span><br><span class="line">                echo <span class="string">"Redis stopped"</span></span><br><span class="line">        fi</span><br><span class="line">        ;;</span><br><span class="line">    restart)</span><br><span class="line">        <span class="string">"$0"</span> stop</span><br><span class="line">        sleep <span class="number">3</span></span><br><span class="line">        <span class="string">"$0"</span> start</span><br><span class="line">        ;;</span><br><span class="line">    *)</span><br><span class="line">        echo <span class="string">"Please use start or stop or restart as first argument"</span></span><br><span class="line">        ;;</span><br><span class="line">esac</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>注意<br><code>REDISPORT</code>: redis端口<br><code>EXEC</code>：redis-server 目录<br><code>CLIEXEC</code>：redis-cli 目录<br><code>PIDFILE</code>：redis进程号存储目录<br><code>CONF</code>：redis配置文件目录<br><code>PASSWORD</code>：客户端链接服务端口令</p>
+</blockquote>
+<p>保存好退出，执行添加执行权限操作<br><code>chmod a+x /etc/init.d/redis</code></p>
+</li>
+<li><p>把脚本添加到系统服务列表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">chkconfig --add redis</span><br><span class="line">chkconfig redis on</span><br><span class="line">chkconfig --list   &#x2F;&#x2F;查看所有注册的脚本文件</span><br></pre></td></tr></table></figure>
+<p>至此设置完成，相关命令如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;etc&#x2F;init.d&#x2F;redis stop #关闭redis服务</span><br><span class="line">&#x2F;etc&#x2F;init.d&#x2F;redis start #启动redis服务</span><br><span class="line">&#x2F;etc&#x2F;init.d&#x2F;redis restart #重启redis服务</span><br><span class="line">service redis stop  #关闭redis服务</span><br><span class="line">service redis start #启动redis服务</span><br><span class="line">service redis restart #重启redis服务</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>Donate comment here</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>Donate</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/img/wechatpay.jpg" alt="eYoung WeChat Pay"/>
+        <p>WeChat Pay</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/img/alipay.png" alt="eYoung Alipay"/>
+        <p>Alipay</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux/" rel="tag"># Linux</a>
+          
+            <a href="/tags/redis/" rel="tag"># redis</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/08/11/springboot/" rel="next" title="springboot">
+                <i class="fa fa-chevron-left"></i> springboot
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/08/11/redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89%E4%B9%8B%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%B1%BB%E5%9E%8B%E5%91%BD%E4%BB%A4/" rel="prev" title="redis学习笔记（二）之字符串类型命令">
+                redis学习笔记（二）之字符串类型命令 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/img/head.jpg"
+                alt="eYoung" />
+            
+              <p class="site-author-name" itemprop="name">eYoung</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/jamy888" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jamy888@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://gitee.com/jamy888" target="_blank" title="gitee">
+                      
+                        <i class="fa fa-fw fa-git-square"></i>gitee</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/jamyzyy" target="_blank" title="csdn">
+                      
+                        <i class="fa fa-fw fa-bookmark-o"></i>csdn</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://zhihu.com/people/jamy888" target="_blank" title="zhihu">
+                      
+                        <i class="fa fa-fw fa-globe"></i>zhihu</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="/img/qq.jpg" target="_blank" title="qq">
+                      
+                        <i class="fa fa-fw fa-qq"></i>qq</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="/img/weixin.jpg" target="_blank" title="weixin">
+                      
+                        <i class="fa fa-fw fa-weixin"></i>weixin</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/jamyzyy" target="_blank" title="weibo">
+                      
+                        <i class="fa fa-fw fa-weibo"></i>weibo</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#redis简介"><span class="nav-number">1.</span> <span class="nav-text">redis简介</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#离线安装"><span class="nav-number">1.1.</span> <span class="nav-text">离线安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#准备redis安装包"><span class="nav-number">1.1.1.</span> <span class="nav-text">准备redis安装包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解压编译安装"><span class="nav-number">1.1.2.</span> <span class="nav-text">解压编译安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动redis"><span class="nav-number">1.1.3.</span> <span class="nav-text">启动redis</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#验证redis是否启动成功"><span class="nav-number">1.1.4.</span> <span class="nav-text">验证redis是否启动成功</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#设置开机自启动"><span class="nav-number">1.1.5.</span> <span class="nav-text">设置开机自启动</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">eYoung</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
