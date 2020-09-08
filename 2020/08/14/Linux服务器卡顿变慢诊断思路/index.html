@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Linux," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="&amp;emsp;&amp;emsp;对于运维开发工程师来说，看到或者听到说生产服务器很卡顿或者访问系统很慢，是一件比较头疼得事，今天我们就根据这个来聊一聊当出现这个情况时，应该如何查看服务器。&amp;emsp;&amp;emsp;生产服务器变慢了，一般都是从这几点去分析：服务器整体情况， CPU 使用情况，内存，磁盘，磁盘 IO ，网络 IO   top&amp;emsp;&amp;emsp;看服务器整体使用情况，一般都是 top 命令搞">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux服务器卡顿变慢诊断思路">
+<meta property="og:url" content="http://yoursite.com/2020/08/14/Linux%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%8D%A1%E9%A1%BF%E5%8F%98%E6%85%A2%E8%AF%8A%E6%96%AD%E6%80%9D%E8%B7%AF/index.html">
+<meta property="og:site_name" content="eYoung的博客">
+<meta property="og:description" content="&amp;emsp;&amp;emsp;对于运维开发工程师来说，看到或者听到说生产服务器很卡顿或者访问系统很慢，是一件比较头疼得事，今天我们就根据这个来聊一聊当出现这个情况时，应该如何查看服务器。&amp;emsp;&amp;emsp;生产服务器变慢了，一般都是从这几点去分析：服务器整体情况， CPU 使用情况，内存，磁盘，磁盘 IO ，网络 IO   top&amp;emsp;&amp;emsp;看服务器整体使用情况，一般都是 top 命令搞">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/images/20200814114053.png">
+<meta property="og:image" content="http://yoursite.com/images/20200814114707.png">
+<meta property="og:image" content="http://yoursite.com/images/20200814115141.png">
+<meta property="og:image" content="http://yoursite.com/images/20200814115940.png">
+<meta property="og:image" content="http://yoursite.com/images/20200814120817.png">
+<meta property="og:image" content="http://yoursite.com/images/20200814143016.png">
+<meta property="og:image" content="http://yoursite.com/images/20200814143358.png">
+<meta property="article:published_time" content="2020-08-14T03:34:22.000Z">
+<meta property="article:modified_time" content="2020-08-14T06:36:58.728Z">
+<meta property="article:author" content="eYoung">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/images/20200814114053.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/08/14/Linux服务器卡顿变慢诊断思路/"/>
+
+
+
+
+
+  <title>Linux服务器卡顿变慢诊断思路 | eYoung的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">eYoung的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            Commonweal 404
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-spring">
+          <a href="/spring" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            spring
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-redis">
+          <a href="/redis" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-bars"></i> <br />
+            
+            redis
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/14/Linux%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%8D%A1%E9%A1%BF%E5%8F%98%E6%85%A2%E8%AF%8A%E6%96%AD%E6%80%9D%E8%B7%AF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="eYoung">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/img/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="eYoung的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Linux服务器卡顿变慢诊断思路</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-08-14T11:34:22+08:00">
+                2020-08-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index">
+                    <span itemprop="name">Linux</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>&emsp;&emsp;对于运维开发工程师来说，看到或者听到说生产服务器很卡顿或者访问系统很慢，是一件比较头疼得事，今天我们就根据这个来聊一聊当出现这个情况时，应该如何查看服务器。<br>&emsp;&emsp;生产服务器变慢了，一般都是从这几点去分析：<strong><em>服务器整体情况， CPU 使用情况，内存，磁盘，磁盘 IO ，网络 IO</em></strong>  </p>
+<h2 id="top"><a href="#top" class="headerlink" title="top"></a>top</h2><p>&emsp;&emsp;看服务器整体使用情况，一般都是 top 命令搞定</p>
+<img src="/images/20200814114053.png" class="[class names]" width="500" height="300" title="top界面" alt="top界面">
+<blockquote>
+<p>top 界面详解<br>第 1 行：系统时间、运行时间、登录终端数、系统负载（三个数值分别为1分钟、5分钟、15分钟内的平均值，数值越小意味着负载越低）<br> 第 2 行：进程总数、运行中的进程数、睡眠中的进程数、停止的进程数、僵死的进程数。一般情况下，只要没有僵死的进程，就没啥大问题。<br> 第 3 行：用户占用资源百分比、系统内核占用资源百分比、改变过优先级的进程资源百分比、空闲的资源百分比等。<br> 第 4 行：物理内存总量、内存空闲量、内存使用量、作为内核缓存的内存量<br> 第 5 行：虚拟内存总量、虚拟内存空闲量、虚拟内存使用量、已被提前加载的内存量<br> 第 6 行里面主要看 PID 和 COMMAND 这两个参数，其中 PID 就是进程 ID ， COMMAND 就是执行的命令，能够看到比较靠前的两个进程都是 java 进程</p>
+</blockquote>
+<p>&emsp;&emsp;在top界面下，按下数字键盘 1 能够看到各个 CPU 的详细利用率</p>
+<img src="/images/20200814114707.png" class="[class names]" width="500" height="300" title="top界面下个cpu的详细信息" alt="top界面">
+
+<h2 id="vmstat"><a href="#vmstat" class="headerlink" title="vmstat"></a>vmstat</h2><p>&emsp;&emsp;想要了解 CPU 使用情况的话，常用的命令就是 <code>vmstat</code>。  </p>
+<img src="/images/20200814115141.png" class="[class names]" width="500" height="300" title="vmstat界面" alt="vmstat界面">  
+<p>&emsp;&emsp;一般 vmstat 工具的使用是通过两个数字参数来完成的</p>
+<ul>
+<li>第一个参数是采样的时间间隔，单位是秒;</li>
+<li>第二个参数是采样的次数;<br><code>vmstat -n 3 2</code> 意思就是隔 3 秒取样一次，一共取样 2 次。  </li>
+</ul>
+<p>&emsp;&emsp;其中主要关注 procs 和 cpu 这两个参数:<br>&emsp;&emsp;<code>procs</code></p>
+<ul>
+<li>r ：运行和等待 CPU 时间片的进程数，一般来说整个系统的运行队列不要超过总核数的 2 倍，要不然系统压力太大了</li>
+<li>b : 等待资源的进程数，比如正在等待磁盘 IO ，网络 IO 这种</li>
+</ul>
+<p>&emsp;&emsp;<code>cpu</code></p>
+<ul>
+<li>us ：用户进程消耗 CPU 时间百分比， us 值高的话，说明用户进程消耗 CPU 时间比较长，如果长期大于 50% 的话，那就说明程序还有需要优化的地方</li>
+<li>sy ：内核进程消耗的 CPU 时间百分比</li>
+<li>us + sy 参考值为 80% ，如果大于 80% 的话，说明可能存在 CPU 不足</li>
+</ul>
+<h2 id="free"><a href="#free" class="headerlink" title="free"></a>free</h2><p>&emsp;&emsp;查看内存情况用的就是 free ， 它主要有三个命令：<code>free</code> <code>free -g</code> <code>free -m</code> ，在这里推荐 <code>free -m</code> 为啥呢，咱们瞅瞅它们各自的运行结果就知道了  </p>
+<img src="/images/20200814115940.png" class="[class names]" width="500" height="300" title="free界面" alt="free界面">  
+
+<p>&emsp;&emsp;其中：<code>free</code> 命令运行结果显示的非常不友好，看到 16252964 可以快速告诉我它是多大吗？<code>free -g</code> 这个命令四舍五入了，明明给的内存是 16G ，结果使用 <code>free -g</code> 一查看，竟然成了 15G ？excuse me ？如果线上环境出问题了，你说因为内存给的不够，运维说，这锅我可不背。<br>&emsp;&emsp;相对来说， <code>free -m</code> 是比较容易看，而且结果也是比较精确的。<br>&emsp;&emsp;如果应用程序可用内存/系统物理内存大于 70% 的话，说明内存是充足的，没啥问题，但是如果小于 20% 的话，就要考虑增加内存了。  </p>
+<h2 id="df"><a href="#df" class="headerlink" title="df"></a>df</h2><p>&emsp;&emsp;如果排查磁盘问题的话，首先要看的就是磁盘空间够不够，最近笔者在多个项目中，均出现过一种情况，就是哪里都不报错，日志也不打印，访问就是很慢或者根本访问不了系统，排查到最后是磁盘空间不够…<br>&emsp;&emsp;所以查磁盘问题时，第一就是看磁盘空间够不够！！！<br>&emsp;&emsp;查看磁盘空间就是 <code>df</code> 或者 <code>df -h</code> 这两个命令了。</p>
+<img src="/images/20200814120817.png" class="[class names]" width="500" height="300" title="df界面" alt="df界面">   
+
+<h2 id="iostat"><a href="#iostat" class="headerlink" title="iostat"></a>iostat</h2><p>&emsp;&emsp;说到磁盘 IO 相信你一定能够想到，在对数据库进行操作时，第一要考虑到的就是磁盘 IO 操作，因为相对来说，如果在某个时间段给磁盘进行大量的写入操作会造成程序等待时间长，导致客户端那边好久都没啥反应，用户体验就降低了吗<br>&emsp;&emsp;检查磁盘 IO 情况的命令就是 iostat ，如果你用的时候发现提示：<code>-bash: iostat: command not found</code> ，那是因为没有安装 <code>sysstat</code> ，安装一下就可以了：<code>yum install -y sysstat</code><br>&emsp;&emsp;接下来运行命令：<code>iostat -xdk 3 2</code> ，和 <code>vmstat</code> 命令很像有没有~  </p>
+<img src="/images/20200814143016.png" class="[class names]" width="500" height="300" title="iostat界面" alt="iostat界面">   
+<p>这么多指标咱们不需要都关注，只要看其中这几个就可以了：</p>
+<ul>
+<li>rkB/s ：每秒读取数据量 kB ；</li>
+<li>wkB/s ：每秒写入数据量 kB ；</li>
+<li>svctm ：I/O 请求的平均服务时间，单位毫秒；</li>
+<li>util ：一秒中有百分之几的时间用于 I/O 操作，如果接近 100% 说明磁盘带宽跑满了，这个时候就要优化程序或者增加磁盘了</li>
+</ul>
+<h2 id="sar"><a href="#sar" class="headerlink" title="sar"></a>sar</h2><p>&emsp;&emsp;网络 IO 的话，可以通过 <code>sar -n DEV 3 2</code> 这条命令来看，和上面的差不多，意思就是每隔 3 秒取样一次，一共取样 2 次。  </p>
+<img src="/images/20200814143358.png" class="[class names]" width="500" height="300" title="sar界面" alt="sar界面">   
+<p>其中：</p>
+<ul>
+<li>IFACE ：LAN 接口</li>
+<li>rxpck/s ：每秒钟接收的数据包</li>
+<li>txpck/s ：每秒钟发送的数据包</li>
+<li>rxKB/s ：每秒接收的数据量，单位 KByte</li>
+<li>txKB/s ：每秒发出的数据量，单位 KByte</li>
+<li>rxcmp/s ：每秒钟接收的压缩数据包</li>
+<li>txcmp/s ：每秒钟发送的压缩数据包</li>
+<li>rxmcst/s：每秒钟接收的多播数据包<br>这种方式特别简单直观，对新手来说比较容易看到</li>
+</ul>
+<p>&emsp;&emsp; OK ，下次面试官问你生产服务器变慢了，你能谈谈诊断思路吗？咋不能呢，从服务器整体情况开始说，一直到网络 IO ，再也不怕和面试官扯皮了</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>Donate comment here</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>Donate</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/img/wechatpay.jpg" alt="eYoung WeChat Pay"/>
+        <p>WeChat Pay</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/img/alipay.png" alt="eYoung Alipay"/>
+        <p>Alipay</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux/" rel="tag"># Linux</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/08/12/ruby%E5%AE%89%E8%A3%85/" rel="next" title="ruby安装">
+                <i class="fa fa-chevron-left"></i> ruby安装
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/08/27/ubuntu-mysql-%E8%AE%BE%E7%BD%AE%E5%A4%A7%E5%B0%8F%E5%86%99%E4%B8%8D%E6%95%8F%E6%84%9F/" rel="prev" title="ubuntu mysql 设置大小写不敏感">
+                ubuntu mysql 设置大小写不敏感 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/img/head.jpg"
+                alt="eYoung" />
+            
+              <p class="site-author-name" itemprop="name">eYoung</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/jamy888" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jamy888@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://gitee.com/jamy888" target="_blank" title="gitee">
+                      
+                        <i class="fa fa-fw fa-git-square"></i>gitee</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/jamyzyy" target="_blank" title="csdn">
+                      
+                        <i class="fa fa-fw fa-bookmark-o"></i>csdn</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://zhihu.com/people/jamy888" target="_blank" title="zhihu">
+                      
+                        <i class="fa fa-fw fa-globe"></i>zhihu</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="/img/qq.jpg" target="_blank" title="qq">
+                      
+                        <i class="fa fa-fw fa-qq"></i>qq</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="/img/weixin.jpg" target="_blank" title="weixin">
+                      
+                        <i class="fa fa-fw fa-weixin"></i>weixin</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/jamyzyy" target="_blank" title="weibo">
+                      
+                        <i class="fa fa-fw fa-weibo"></i>weibo</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#top"><span class="nav-number">1.</span> <span class="nav-text">top</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#vmstat"><span class="nav-number">2.</span> <span class="nav-text">vmstat</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#free"><span class="nav-number">3.</span> <span class="nav-text">free</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#df"><span class="nav-number">4.</span> <span class="nav-text">df</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#iostat"><span class="nav-number">5.</span> <span class="nav-text">iostat</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sar"><span class="nav-number">6.</span> <span class="nav-text">sar</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">eYoung</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
