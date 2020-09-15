@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="oauth2.0," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="&amp;emsp;&amp;emsp;OAuth是一个关于授权（authorization）的开放网络标准，在全世界得到广泛应用，目前的版本是2.0版。&amp;emsp;&amp;emsp;本文对OAuth 2.0的设计思路和运行流程，做一个简明通俗的解释，主要参考材料为RFC 6749。   应用场景&amp;emsp;&amp;emsp;为了理解OAuth的适用场合，让我举一个假设的例子。&amp;emsp;&amp;emsp;有一个“云冲印”的网站，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="理解OAuth 2.0">
+<meta property="og:url" content="http://yoursite.com/2020/09/14/%E7%90%86%E8%A7%A3OAuth-2-0/index.html">
+<meta property="og:site_name" content="eYoung的博客">
+<meta property="og:description" content="&amp;emsp;&amp;emsp;OAuth是一个关于授权（authorization）的开放网络标准，在全世界得到广泛应用，目前的版本是2.0版。&amp;emsp;&amp;emsp;本文对OAuth 2.0的设计思路和运行流程，做一个简明通俗的解释，主要参考材料为RFC 6749。   应用场景&amp;emsp;&amp;emsp;为了理解OAuth的适用场合，让我举一个假设的例子。&amp;emsp;&amp;emsp;有一个“云冲印”的网站，">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/images/20200914110416.png">
+<meta property="og:image" content="http://yoursite.com/images/20200914111404.png">
+<meta property="og:image" content="http://yoursite.com/images/20200914112414.png">
+<meta property="og:image" content="http://yoursite.com/images/20200914112918.png">
+<meta property="og:image" content="http://yoursite.com/images/20200914113340.png">
+<meta property="article:published_time" content="2020-09-14T02:50:53.000Z">
+<meta property="article:modified_time" content="2020-09-14T04:03:33.088Z">
+<meta property="article:author" content="eYoung">
+<meta property="article:tag" content="oauth2.0">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/images/20200914110416.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/09/14/理解OAuth-2-0/"/>
+
+
+
+
+
+  <title>理解OAuth 2.0 | eYoung的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">eYoung的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            Commonweal 404
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-spring">
+          <a href="/spring" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            spring
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-redis">
+          <a href="/redis" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-bars"></i> <br />
+            
+            redis
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/09/14/%E7%90%86%E8%A7%A3OAuth-2-0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="eYoung">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/img/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="eYoung的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">理解OAuth 2.0</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-09-14T10:50:53+08:00">
+                2020-09-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BC%80%E5%8F%91%E8%80%85%E6%89%8B%E5%86%8C/" itemprop="url" rel="index">
+                    <span itemprop="name">开发者手册</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>&emsp;&emsp;<a href="http://en.wikipedia.org/wiki/OAuth" title="" target="">OAuth</a>是一个关于授权（authorization）的开放网络标准，在全世界得到广泛应用，目前的版本是2.0版。<br>&emsp;&emsp;本文对OAuth 2.0的设计思路和运行流程，做一个简明通俗的解释，主要参考材料为<a href="http://www.rfcreader.com/#rfc6749" title="" target="">RFC 6749</a>。  </p>
+<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><p>&emsp;&emsp;为了理解OAuth的适用场合，让我举一个假设的例子。<br>&emsp;&emsp;有一个“云冲印”的网站，可以将用户储存在Google的照片，冲印出来。用户为了使用该服务，必须让“云冲印“读取自己储存在Google上的照片。<br>&emsp;&emsp;问题是只有得到用户的授权，Google才会同意“云冲印”读取这些照片。那么，“云冲印”怎样获得用户的授权呢？<br>&emsp;&emsp;传统方法是，用户将自己的Google用户名和密码，告诉“云冲印“，后者就可以读取用户的照片了。这样的做法有以下几个严重的缺点。  </p>
+<blockquote>
+<p>（1）“云冲印”为了后续的服务，会保存用户的密码，这样很不安全。<br> （2）Google不得不部署密码登录，而我们知道，单纯的密码登录并不安全。<br> （3）“云冲印”拥有了获取用户储存在Google所有资料的权力，用户没法限制“云冲印”获得授权的范围和有效期。<br> （4）用户只有修改密码，才能收回赋予“云冲印”的权力。但是这样做，会使得其他所有获得用户授权的第三方应用程序全部失效。<br> （5）只要有一个第三方应用程序被破解，就会导致用户密码泄漏，以及所有被密码保护的数据泄漏。  </p>
+</blockquote>
+<p>&emsp;&emsp;OAuth就是为了解决上面这些问题而诞生的。</p>
+<h2 id="名词定义"><a href="#名词定义" class="headerlink" title="名词定义"></a>名词定义</h2><p>&emsp;&emsp;在详细讲解OAuth 2.0之前，需要了解几个专用名词。它们对读懂后面的讲解，尤其是几张图，至关重要。  </p>
+<blockquote>
+<p>（1）Third-party application：第三方应用程序，本文中又称“客户端”（client），即上一节例子中的“云冲印”。<br> （2）HTTP service：HTTP服务提供商，本文中简称“服务提供商”，即上一节例子中的Google。<br> （3）Resource Owner：资源所有者，本文中又称“用户”（user）。<br> （4）User Agent：用户代理，本文中就是指浏览器。<br> （5）Authorization server：认证服务器，即服务提供商专门用来处理认证的服务器。<br> （6）Resource server：资源服务器，即服务提供商存放用户生成的资源的服务器。它与认证服务器，可以是同一台服务器，也可以是不同的服务器。</p>
+</blockquote>
+<p>&emsp;&emsp;知道了上面这些名词，就不难理解，OAuth的作用就是让“客户端”安全可控地获取“用户”的授权，与“服务商提供商”进行互动。  </p>
+<h2 id="OAuth的思路"><a href="#OAuth的思路" class="headerlink" title="OAuth的思路"></a>OAuth的思路</h2><p>&emsp;&emsp;OAuth在“客户端”与“服务提供商”之间，设置了一个授权层（authorization layer）。“客户端”不能直接登录“服务提供商”，只能登录授权层，以此将用户与客户端区分开来。“客户端“登录授权层所用的令牌（token），与用户的密码不同。用户可以在登录的时候，指定授权层令牌的权限范围和有效期。<br>&emsp;&emsp;“客户端”登录授权层以后，“服务提供商”根据令牌的权限范围和有效期，向“客户端”开放用户储存的资料。  </p>
+<h2 id="运行流程"><a href="#运行流程" class="headerlink" title="运行流程"></a>运行流程</h2><p>&emsp;&emsp;OAuth 2.0的运行流程如下图，摘自<a href="http://www.rfcreader.com/#rfc6749_line259" title="" target="">RFC 6749</a>。  </p>
+<img src="/images/20200914110416.png" class="[class names]" width="500" height="300" title="Abstract Protocol Flow" alt="Abstract Protocol Flow">
+<blockquote>
+<p>（A）用户打开客户端以后，客户端要求用户给予授权。<br> （B）用户同意给予客户端授权。<br> （C）客户端使用上一步获得的授权，向认证服务器申请令牌。<br> （D）认证服务器对客户端进行认证以后，确认无误，同意发放令牌。<br> （E）客户端使用令牌，向资源服务器申请获取资源。<br> （F）资源服务器确认令牌无误，同意向客户端开放资源。  </p>
+</blockquote>
+<p>&emsp;&emsp;不难看出来，上面六个步骤之中，B是关键，即用户怎样才能给于客户端授权。有了这个授权以后，客户端就可以获取令牌，进而凭令牌获取资源。<br>&emsp;&emsp;下面一一讲解客户端获取授权的四种模式。</p>
+<h2 id="客户端的授权模式"><a href="#客户端的授权模式" class="headerlink" title="客户端的授权模式"></a>客户端的授权模式</h2><p>&emsp;&emsp;客户端必须得到用户的授权（authorization grant），才能获得令牌（access token）。OAuth 2.0定义了四种授权方式。  </p>
+<ul>
+<li>授权码模式（authorization code）  </li>
+<li>简化模式（implicit）</li>
+<li>密码模式（resource owner password credentials）</li>
+<li>客户端模式（client credentials）<h3 id="授权码模式"><a href="#授权码模式" class="headerlink" title="授权码模式"></a>授权码模式</h3>&emsp;&emsp;授权码模式（authorization code）是功能最完整、流程最严密的授权模式。它的特点就是通过客户端的后台服务器，与“服务提供商”的认证服务器进行互动。  <img src="/images/20200914111404.png" class="[class names]" width="500" height="300" title="Authorization Code Flow" alt="Authorization Code Flow">  
+它的步骤如下：<blockquote>
+<p>（A）用户访问客户端，后者将前者导向认证服务器。<br>（B）用户选择是否给予客户端授权。<br>（C）假设用户给予授权，认证服务器将用户导向客户端事先指定的“重定向URI”（redirection URI），同时附上一个授权码。<br>（D）客户端收到授权码，附上早先的“重定向URI”，向认证服务器申请令牌。这一步是在客户端的后台的服务器上完成的，对用户不可见。<br>（E）认证服务器核对了授权码和重定向URI，确认无误后，向客户端发送访问令牌（access token）和更新令牌（refresh token）。  </p>
+</blockquote>
+</li>
+</ul>
+<p>&emsp;&emsp;下面是上面这些步骤所需要的参数。<br>&emsp;&emsp;A步骤中，客户端申请认证的URI，包含以下参数：  </p>
+<ul>
+<li>response_type：表示授权类型，必选项，此处的值固定为“code”</li>
+<li>client_id：表示客户端的ID，必选项</li>
+<li>redirect_uri：表示重定向URI，可选项</li>
+<li>scope：表示申请的权限范围，可选项</li>
+<li>state：表示客户端的当前状态，可以指定任意值，认证服务器会原封不动地返回这个值。  </li>
+</ul>
+<p>&emsp;&emsp;下面是一个例子。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">GET /authorize?response_type=code&amp;client_id=s6BhdRkqt3&amp;state=xyz</span><br><span class="line">        &amp;redirect_uri=https%<span class="number">3</span>A%<span class="number">2</span>F%<span class="number">2</span>Fclient%<span class="number">2</span>Eexample%<span class="number">2</span>Ecom%<span class="number">2</span>Fcb HTTP/<span class="number">1.1</span></span><br><span class="line">Host: server.example.com</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;C步骤中，服务器回应客户端的URI，包含以下参数：  </p>
+<ul>
+<li>code：表示授权码，必选项。该码的有效期应该很短，通常设为10分钟，客户端只能使用该码一次，否则会被授权服务器拒绝。该码与客户端ID和重定向URI，是一一对应关系。</li>
+<li>state：如果客户端的请求中包含这个参数，认证服务器的回应也必须一模一样包含这个参数。 </li>
+</ul>
+<p>&emsp;&emsp;下面是一个例子。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">HTTP/<span class="number">1.1</span> <span class="number">302</span> Found</span><br><span class="line">Location: https:<span class="comment">//client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA</span></span><br><span class="line">          &amp;state=xyz</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;D步骤中，客户端向认证服务器申请令牌的HTTP请求，包含以下参数：</p>
+<ul>
+<li>grant_type：表示使用的授权模式，必选项，此处的值固定为“authorization_code”。</li>
+<li>code：表示上一步获得的授权码，必选项。</li>
+<li>redirect_uri：表示重定向URI，必选项，且必须与A步骤中的该参数值保持一致。</li>
+<li>client_id：表示客户端ID，必选项。</li>
+</ul>
+<p>&emsp;&emsp;下面是一个例子。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">POST /token HTTP/<span class="number">1.1</span></span><br><span class="line">Host: server.example.com</span><br><span class="line">Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW</span><br><span class="line">Content-Type: application/x-www-form-urlencoded</span><br><span class="line"></span><br><span class="line">grant_type=authorization_code&amp;code=SplxlOBeZQQYbYS6WxSbIA</span><br><span class="line">&amp;redirect_uri=https%<span class="number">3</span>A%<span class="number">2</span>F%<span class="number">2</span>Fclient%<span class="number">2</span>Eexample%<span class="number">2</span>Ecom%<span class="number">2</span>Fcb</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;E步骤中，认证服务器发送的HTTP回复，包含以下参数：</p>
+<ul>
+<li>access_token：表示访问令牌，必选项。</li>
+<li>token_type：表示令牌类型，该值大小写不敏感，必选项，可以是bearer类型或mac类型。</li>
+<li>expires_in：表示过期时间，单位为秒。如果省略该参数，必须其他方式设置过期时间。</li>
+<li>refresh_token：表示更新令牌，用来获取下一次的访问令牌，可选项。</li>
+<li>scope：表示权限范围，如果与客户端申请的范围一致，此项可省略。</li>
+</ul>
+<p>&emsp;&emsp;下面是一个例子。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Content-Type: application/json;charset=UTF-8</span><br><span class="line">Cache-Control: no-store</span><br><span class="line">Pragma: no-cache</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">  <span class="attr">"access_token"</span>:<span class="string">"2YotnFZFEjr1zCsicMWpAA"</span>,</span><br><span class="line">  <span class="attr">"token_type"</span>:<span class="string">"example"</span>,</span><br><span class="line">  <span class="attr">"expires_in"</span>:<span class="number">3600</span>,</span><br><span class="line">  <span class="attr">"refresh_token"</span>:<span class="string">"tGzv3JOkF0XG5Qx2TlKWIA"</span>,</span><br><span class="line">  <span class="attr">"example_parameter"</span>:<span class="string">"example_value"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;从上面代码可以看到，相关参数使用JSON格式发送（Content-Type: application/json）。此外，HTTP头信息中明确指定不得缓存。</p>
+<h3 id="简化模式"><a href="#简化模式" class="headerlink" title="简化模式"></a>简化模式</h3><p>&emsp;&emsp;简化模式（implicit grant type）不通过第三方应用程序的服务器，直接在浏览器中向认证服务器申请令牌，跳过了“授权码”这个步骤，因此得名。所有步骤在浏览器中完成，令牌对访问者是可见的，且客户端不需要认证。</p>
+<img src="/images/20200914112414.png" class="[class names]" width="500" height="300" title="Implicit Grant Flow" alt="Implicit Grant Flow">  
+<p>&emsp;&emsp;它的步骤如下：</p>
+<blockquote>
+<p>（A）客户端将用户导向认证服务器。<br> （B）用户决定是否给于客户端授权。<br> （C）假设用户给予授权，认证服务器将用户导向客户端指定的“重定向URI”，并在URI的Hash部分包含了访问令牌。<br> （D）浏览器向资源服务器发出请求，其中不包括上一步收到的Hash值。<br> （E）资源服务器返回一个网页，其中包含的代码可以获取Hash值中的令牌。<br> （F）浏览器执行上一步获得的脚本，提取出令牌。<br> （G）浏览器将令牌发给客户端。  </p>
+</blockquote>
+<p>&emsp;&emsp;下面是上面这些步骤所需要的参数。<br>&emsp;&emsp;A步骤中，客户端发出的HTTP请求，包含以下参数：</p>
+<ul>
+<li>response_type：表示授权类型，此处的值固定为“token”，必选项。</li>
+<li>client_id：表示客户端的ID，必选项。</li>
+<li>redirect_uri：表示重定向的URI，可选项。</li>
+<li>scope：表示权限范围，可选项。</li>
+<li>state：表示客户端的当前状态，可以指定任意值，认证服务器会原封不动地返回这个值。</li>
+</ul>
+<p>&emsp;&emsp;下面是一个例子。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">HTTP/<span class="number">1.1</span> <span class="number">302</span> Found</span><br><span class="line">Location: http:<span class="comment">//example.com/cb#access_token=2YotnFZFEjr1zCsicMWpAA&amp;state=xyz&amp;token_type=example&amp;expires_in=3600</span></span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;在上面的例子中，认证服务器用HTTP头信息的Location栏，指定浏览器重定向的网址。注意，在这个网址的Hash部分包含了令牌。<br>&emsp;&emsp;根据上面的D步骤，下一步浏览器会访问Location指定的网址，但是Hash部分不会发送。接下来的E步骤，服务提供商的资源服务器发送过来的代码，会提取出Hash中的令牌。</p>
+<h3 id="密码模式"><a href="#密码模式" class="headerlink" title="密码模式"></a>密码模式</h3><p>&emsp;&emsp;密码模式（Resource Owner Password Credentials Grant）中，用户向客户端提供自己的用户名和密码。客户端使用这些信息，向“服务商提供商”索要授权。<br>&emsp;&emsp;在这种模式中，用户必须把自己的密码给客户端，但是客户端不得储存密码。这通常用在用户对客户端高度信任的情况下，比如客户端是操作系统的一部分，或者由一个著名公司出品。而认证服务器只有在其他授权模式无法执行的情况下，才能考虑使用这种模式。  </p>
+<img src="/images/20200914112918.png" class="[class names]" width="500" height="300" title="Resource Owner Password Credentials Flow" alt="Resource Owner Password Credentials Flow">  
+<p>&emsp;&emsp;它的步骤如下：</p>
+<blockquote>
+<p>（A）用户向客户端提供用户名和密码。<br> （B）客户端将用户名和密码发给认证服务器，向后者请求令牌。<br> （C）认证服务器确认无误后，向客户端提供访问令牌。  </p>
+</blockquote>
+<p>&emsp;&emsp;B步骤中，客户端发出的HTTP请求，包含以下参数：</p>
+<ul>
+<li>grant_type：表示授权类型，此处的值固定为“password”，必选项。</li>
+<li>username：表示用户名，必选项。</li>
+<li>password：表示用户的密码，必选项。</li>
+<li>scope：表示权限范围，可选项。  </li>
+</ul>
+<p>&emsp;&emsp;下面是一个例子。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">POST /token HTTP/<span class="number">1.1</span></span><br><span class="line">Host: server.example.com</span><br><span class="line">Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW</span><br><span class="line">Content-Type: application/x-www-form-urlencoded</span><br><span class="line"></span><br><span class="line">grant_type=password&amp;username=johndoe&amp;password=A3ddj3w</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;C步骤中，认证服务器向客户端发送访问令牌，下面是一个例子。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Content-Type: application/json;charset=UTF-8</span><br><span class="line">Cache-Control: no-store</span><br><span class="line">Pragma: no-cache</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">"access_token"</span>:<span class="string">"2YotnFZFEjr1zCsicMWpAA"</span>,</span><br><span class="line">    <span class="attr">"token_type"</span>:<span class="string">"example"</span>,</span><br><span class="line">    <span class="attr">"expires_in"</span>:<span class="number">3600</span>,</span><br><span class="line">    <span class="attr">"refresh_token"</span>:<span class="string">"tGzv3JOkF0XG5Qx2TlKWIA"</span>,</span><br><span class="line">    <span class="attr">"example_parameter"</span>:<span class="string">"example_value"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;上面代码中，各个参数的含义参见《授权码模式》一节。<br>&emsp;&emsp;整个过程中，客户端不得保存用户的密码。  </p>
+<h3 id="客户端模式"><a href="#客户端模式" class="headerlink" title="客户端模式"></a>客户端模式</h3><p>&emsp;&emsp;客户端模式（Client Credentials Grant）指客户端以自己的名义，而不是以用户的名义，向“服务提供商”进行认证。严格地说，客户端模式并不属于OAuth框架所要解决的问题。在这种模式中，用户直接向客户端注册，客户端以自己的名义要求“服务提供商“提供服务，其实不存在授权问题。  </p>
+<img src="/images/20200914113340.png" class="[class names]" width="500" height="300" title="Client Credentials Flow" alt="Client Credentials Flow">  
+<p>&emsp;&emsp;它的步骤如下：  </p>
+<blockquote>
+<p>（A）客户端向认证服务器进行身份认证，并要求一个访问令牌。<br> （B）认证服务器确认无误后，向客户端提供访问令牌。</p>
+</blockquote>
+<p>&emsp;&emsp;A步骤中，客户端发出的HTTP请求，包含以下参数：  </p>
+<ul>
+<li>grant_type：表示授权类型，此处的值固定为“client_credentials”，必选项。</li>
+<li>scope：表示权限范围，可选项。  <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">POST /token HTTP/<span class="number">1.1</span></span><br><span class="line">Host: server.example.com</span><br><span class="line">Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW</span><br><span class="line">Content-Type: application/x-www-form-urlencoded</span><br><span class="line"></span><br><span class="line">grant_type=client_credentials</span><br></pre></td></tr></table></figure>
+&emsp;&emsp;认证服务器必须以某种方式，验证客户端身份。<br>&emsp;&emsp;B步骤中，认证服务器向客户端发送访问令牌，下面是一个例子。<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Content-Type: application/json;charset=UTF-8</span><br><span class="line">Cache-Control: no-store</span><br><span class="line">Pragma: no-cache</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">"access_token"</span>:<span class="string">"2YotnFZFEjr1zCsicMWpAA"</span>,</span><br><span class="line">    <span class="attr">"token_type"</span>:<span class="string">"example"</span>,</span><br><span class="line">    <span class="attr">"expires_in"</span>:<span class="number">3600</span>,</span><br><span class="line">    <span class="attr">"example_parameter"</span>:<span class="string">"example_value"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+&emsp;&emsp;上面代码中，各个参数的含义参见《授权码模式》一节。  <h3 id="更新令牌"><a href="#更新令牌" class="headerlink" title="更新令牌"></a>更新令牌</h3></li>
+</ul>
+<p>&emsp;&emsp;如果用户访问的时候，客户端的“访问令牌”已经过期，则需要使用“更新令牌”申请一个新的访问令牌。<br>&emsp;&emsp;客户端发出更新令牌的HTTP请求，包含以下参数：  </p>
+<ul>
+<li>grant_type：表示使用的授权模式，此处的值固定为“refresh_token”，必选项。</li>
+<li>refresh_token：表示早前收到的更新令牌，必选项。</li>
+<li>scope：表示申请的授权范围，不可以超出上一次申请的范围，如果省略该参数，则表示与上一次一致。</li>
+</ul>
+<p>&emsp;&emsp;下面是一个例子。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">POST /token HTTP/1.1</span><br><span class="line">Host: server.example.com</span><br><span class="line">Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW</span><br><span class="line">Content-Type: application/x-www-form-urlencoded</span><br><span class="line"></span><br><span class="line">grant_type=refresh_token&amp;refresh_token=tGzv3JOkF0XG5Qx2TlKWIA</span><br></pre></td></tr></table></figure>
+
+<p><strong>* 本文章转载自阮一峰老师的文章<a href="http://www.ruanyifeng.com/blog/2014/05/oauth_2_0.html" title="" target="">理解OAuth 2.0</a> *</strong></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>Donate comment here</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>Donate</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/img/wechatpay.jpg" alt="eYoung WeChat Pay"/>
+        <p>WeChat Pay</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/img/alipay.png" alt="eYoung Alipay"/>
+        <p>Alipay</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/oauth2-0/" rel="tag"># oauth2.0</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/09/08/sublime-text3-json%E6%A0%BC%E5%BC%8F%E5%8C%96/" rel="next" title="sublime text3 json格式化">
+                <i class="fa fa-chevron-left"></i> sublime text3 json格式化
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/img/head.jpg"
+                alt="eYoung" />
+            
+              <p class="site-author-name" itemprop="name">eYoung</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/jamy888" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jamy888@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://gitee.com/jamy888" target="_blank" title="gitee">
+                      
+                        <i class="fa fa-fw fa-git-square"></i>gitee</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/jamyzyy" target="_blank" title="csdn">
+                      
+                        <i class="fa fa-fw fa-bookmark-o"></i>csdn</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://zhihu.com/people/jamy888" target="_blank" title="zhihu">
+                      
+                        <i class="fa fa-fw fa-globe"></i>zhihu</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="/img/qq.jpg" target="_blank" title="qq">
+                      
+                        <i class="fa fa-fw fa-qq"></i>qq</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="/img/weixin.jpg" target="_blank" title="weixin">
+                      
+                        <i class="fa fa-fw fa-weixin"></i>weixin</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/jamyzyy" target="_blank" title="weibo">
+                      
+                        <i class="fa fa-fw fa-weibo"></i>weibo</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#应用场景"><span class="nav-number">1.</span> <span class="nav-text">应用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#名词定义"><span class="nav-number">2.</span> <span class="nav-text">名词定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OAuth的思路"><span class="nav-number">3.</span> <span class="nav-text">OAuth的思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#运行流程"><span class="nav-number">4.</span> <span class="nav-text">运行流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#客户端的授权模式"><span class="nav-number">5.</span> <span class="nav-text">客户端的授权模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#授权码模式"><span class="nav-number">5.1.</span> <span class="nav-text">授权码模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#简化模式"><span class="nav-number">5.2.</span> <span class="nav-text">简化模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#密码模式"><span class="nav-number">5.3.</span> <span class="nav-text">密码模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#客户端模式"><span class="nav-number">5.4.</span> <span class="nav-text">客户端模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#更新令牌"><span class="nav-number">5.5.</span> <span class="nav-text">更新令牌</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">eYoung</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
