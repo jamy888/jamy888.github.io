@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="Linux," />
 
 
 
@@ -79,14 +79,17 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="标签">
-<meta property="og:url" content="http://yoursite.com/tags/index.html">
+<meta name="description" content="shell curl 取得HTTP返回的状态码1curl -I -m 10 -o &#x2F;dev&#x2F;null -s -w %&amp;#123;http_code&amp;#125; www.baidu.com  -I 仅测试HTTP头-m 10 最多查询10s-o &#x2F;dev&#x2F;null 屏蔽原有输出信息，把curl 返回的html、js 写到垃圾回收站[&#x2F;dev&#x2F;null]-s silent 模式，去掉所有状态，不输出任">
+<meta property="og:type" content="article">
+<meta property="og:title" content="curl命令查看请求响应时间、返回状态码">
+<meta property="og:url" content="http://yoursite.com/2021/03/02/curl%E5%91%BD%E4%BB%A4%E6%9F%A5%E7%9C%8B%E8%AF%B7%E6%B1%82%E5%93%8D%E5%BA%94%E6%97%B6%E9%97%B4%E3%80%81%E8%BF%94%E5%9B%9E%E7%8A%B6%E6%80%81%E7%A0%81/index.html">
 <meta property="og:site_name" content="eYoung的博客">
+<meta property="og:description" content="shell curl 取得HTTP返回的状态码1curl -I -m 10 -o &#x2F;dev&#x2F;null -s -w %&amp;#123;http_code&amp;#125; www.baidu.com  -I 仅测试HTTP头-m 10 最多查询10s-o &#x2F;dev&#x2F;null 屏蔽原有输出信息，把curl 返回的html、js 写到垃圾回收站[&#x2F;dev&#x2F;null]-s silent 模式，去掉所有状态，不输出任">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2020-08-11T08:58:18.000Z">
-<meta property="article:modified_time" content="2020-08-11T08:59:10.425Z">
+<meta property="article:published_time" content="2021-03-02T08:46:40.000Z">
+<meta property="article:modified_time" content="2021-03-02T08:53:39.980Z">
 <meta property="article:author" content="eYoung">
+<meta property="article:tag" content="Linux">
 <meta name="twitter:card" content="summary">
 
 
@@ -117,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/tags/"/>
+  <link rel="canonical" href="http://yoursite.com/2021/03/02/curl命令查看请求响应时间、返回状态码/"/>
 
 
 
 
 
-  <title>标签 | eYoung的博客</title>
+  <title>curl命令查看请求响应时间、返回状态码 | eYoung的博客</title>
   
 
 
@@ -278,40 +281,203 @@
 
   <div id="posts" class="posts-expand">
     
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/03/02/curl%E5%91%BD%E4%BB%A4%E6%9F%A5%E7%9C%8B%E8%AF%B7%E6%B1%82%E5%93%8D%E5%BA%94%E6%97%B6%E9%97%B4%E3%80%81%E8%BF%94%E5%9B%9E%E7%8A%B6%E6%80%81%E7%A0%81/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="eYoung">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/img/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="eYoung的博客">
+    </span>
+
     
-    
-    <div class="post-block page">
       <header class="post-header">
 
-	<h1 class="post-title" itemprop="name headline">标签</h1>
-
-
-
-</header>
-
-      
-      
-      
-      <div class="post-body">
         
         
-          <div class="tag-cloud">
-            <div class="tag-cloud-title">
-                12 tags in total
-            </div>
-            <div class="tag-cloud-tags">
-              <a href="/tags/Linux/" style="font-size: 30px; color: #111">Linux</a> <a href="/tags/git/" style="font-size: 12px; color: #ccc">git</a> <a href="/tags/github/" style="font-size: 12px; color: #ccc">github</a> <a href="/tags/hexo/" style="font-size: 12px; color: #ccc">hexo</a> <a href="/tags/mysql/" style="font-size: 12px; color: #ccc">mysql</a> <a href="/tags/oauth2-0/" style="font-size: 12px; color: #ccc">oauth2.0</a> <a href="/tags/redis/" style="font-size: 21px; color: #6f6f6f">redis</a> <a href="/tags/ruby/" style="font-size: 12px; color: #ccc">ruby</a> <a href="/tags/ubuntu/" style="font-size: 12px; color: #ccc">ubuntu</a> <a href="/tags/windows/" style="font-size: 12px; color: #ccc">windows</a> <a href="/tags/%E5%B7%A5%E5%85%B7/" style="font-size: 12px; color: #ccc">工具</a> <a href="/tags/%E7%AB%AF%E5%8F%A3%E5%8D%A0%E7%94%A8/" style="font-size: 12px; color: #ccc">端口占用</a>
-            </div>
-          </div>
+          <h1 class="post-title" itemprop="name headline">curl命令查看请求响应时间、返回状态码</h1>
         
-      </div>
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2021-03-02T16:46:40+08:00">
+                2021-03-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index">
+                    <span itemprop="name">Linux</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
       
       
+
+      
+        <h2 id="shell-curl-取得HTTP返回的状态码"><a href="#shell-curl-取得HTTP返回的状态码" class="headerlink" title="shell curl 取得HTTP返回的状态码"></a>shell curl 取得HTTP返回的状态码</h2><figure class="highlight handlebars"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="xml">curl -I -m 10 -o /dev/null -s -w %&#123;http_code&#125; www.baidu.com</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>-I 仅测试HTTP头<br>-m 10 最多查询10s<br>-o /dev/null 屏蔽原有输出信息，把curl 返回的html、js 写到垃圾回收站[/dev/null]<br>-s silent 模式，去掉所有状态，不输出任何东西<br>-w %{http_code} 控制额外输出</p>
+</blockquote>
+<figure class="highlight handlebars"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="xml">curl -w "%&#123;time_namelookup&#125;::%&#123;time_connect&#125;::%&#123;time_starttransfer&#125;::%&#123;time_total&#125;::%&#123;speed_download&#125;" "\n"</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><code>time_namelookup</code>  DNS解析域名时间<br><code>time_connect</code>  TCP连接的时间，三次握手的时间<br><code>time_starttransfer</code> 从请求开始到第一个字节将要传输的时间<br><code>time_total</code> 总时间<br><code>speed_download</code> 下载速度，单位-字节每秒<br><code>time_appconnect</code> <code>SSL|SSH</code>等上层连接建立的时间<br><code>time_pretransfer</code> 从请求开始到响应开始传输的时间<br><code>time_redirect</code> 从开始到最后一个请求事务的时间  </p>
+</blockquote>
+
       
     </div>
     
     
     
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>Donate comment here</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>Donate</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/img/wechatpay.jpg" alt="eYoung WeChat Pay"/>
+        <p>WeChat Pay</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/img/alipay.png" alt="eYoung Alipay"/>
+        <p>Alipay</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux/" rel="tag"># Linux</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/09/14/%E7%90%86%E8%A7%A3OAuth-2-0/" rel="next" title="理解OAuth 2.0">
+                <i class="fa fa-chevron-left"></i> 理解OAuth 2.0
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
   </div>
 
 
@@ -344,8 +510,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -461,6 +636,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#shell-curl-取得HTTP返回的状态码"><span class="nav-number">1.</span> <span class="nav-text">shell curl 取得HTTP返回的状态码</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
